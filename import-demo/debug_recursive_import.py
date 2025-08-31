@@ -23,10 +23,10 @@ def debug_import_a_b_c():
     print("🚀" + "="*80)
     
     print("\n📋 预期的递归调用顺序:")
-    print("1️⃣ python_import_simulation('a.b.c')")
-    print("   ├── 🔄 递归调用: python_import_simulation('a')")
-    print("   ├── 🔄 递归调用: python_import_simulation('a.b')")
-    print("   └── 🎯 最终导入: 'a.b.c'")
+    print("1️⃣ python_import_simulation('test_a.b.c')")
+    print("   ├── 🔄 递归调用: python_import_simulation('test_a')")
+    print("   ├── 🔄 递归调用: python_import_simulation('test_a.b')")
+    print("   └── 🎯 最终导入: 'test_a.b.c'")
     
     print("\n" + "="*80)
     print("🎬 开始实际执行...")
@@ -53,7 +53,7 @@ def debug_import_a_b_c():
         
         # 检查缓存中的模块
         print(f"\n📦 sys.modules 中的相关模块:")
-        for mod_name in ['a', 'a.b', 'a.b.c']:
+        for mod_name in ['test_a', 'test_a.b', 'test_a.b.c']:
             if mod_name in sys.modules:
                 mod = sys.modules[mod_name]
                 print(f"   ✅ {mod_name}: {mod}")
@@ -64,36 +64,36 @@ def debug_import_a_b_c():
         print(f"\n🧪 功能测试:")
         
         # 测试顶层包 a
-        if 'a' in sys.modules:
-            a_module = sys.modules['a']
+        if 'test_a' in sys.modules:
+            a_module = sys.modules['test_a']
             if hasattr(a_module, 'function_in_a'):
-                print(f"   📞 a.function_in_a(): {a_module.function_in_a()}")
+                print(f"   📞 test_a.function_in_a(): {a_module.function_in_a()}")
         
         # 测试中间包 a.b
-        if 'a.b' in sys.modules:
-            ab_module = sys.modules['a.b']
+        if 'test_a.b' in sys.modules:
+            ab_module = sys.modules['test_a.b']
             if hasattr(ab_module, 'function_in_b'):
-                print(f"   📞 a.b.function_in_b(): {ab_module.function_in_b()}")
+                print(f"   📞 test_a.b.function_in_b(): {ab_module.function_in_b()}")
         
         # 测试目标模块 a.b.c
-        if 'a.b.c' in sys.modules:
-            abc_module = sys.modules['a.b.c']
+        if 'test_a.b.c' in sys.modules:
+            abc_module = sys.modules['test_a.b.c']
             if hasattr(abc_module, 'function_in_c'):
-                print(f"   📞 a.b.c.function_in_c(): {abc_module.function_in_c()}")
+                print(f"   📞 test_a.b.c.function_in_c(): {abc_module.function_in_c()}")
             if hasattr(abc_module, 'ClassInC'):
                 obj = abc_module.ClassInC("测试实例")
-                print(f"   🏗️ a.b.c.ClassInC 实例: {obj.get_info()}")
+                print(f"   🏗️ test_a.b.c.ClassInC 实例: {obj.get_info()}")
         
         # 验证包属性绑定
         print(f"\n🔗 包属性绑定检查:")
-        if 'a' in sys.modules and hasattr(sys.modules['a'], 'b'):
-            print(f"   ✅ a.b 已绑定到包 a")
-            if hasattr(sys.modules['a'].b, 'c'):
-                print(f"   ✅ a.b.c 已绑定到包 a.b")
+        if 'test_a' in sys.modules and hasattr(sys.modules['test_a'], 'b'):
+            print(f"   ✅ test_a.b 已绑定到包 test_a")
+            if hasattr(sys.modules['test_a'].b, 'c'):
+                print(f"   ✅ test_a.b.c 已绑定到包 test_a.b")
             else:
-                print(f"   ❌ a.b.c 未绑定到包 a.b")
+                print(f"   ❌ test_a.b.c 未绑定到包 test_a.b")
         else:
-            print(f"   ❌ a.b 未绑定到包 a")
+            print(f"   ❌ test_a.b 未绑定到包 test_a")
             
     except Exception as e:
         print(f"\n❌ 导入失败: {e}")
@@ -109,29 +109,29 @@ def debug_different_import_styles():
     print("🚀" + "="*80)
     
     # 清理缓存
-    modules_to_clean = ['a', 'a.b', 'a.b.c']
+    modules_to_clean = ['test_a', 'test_a.b', 'test_a.b.c']
     for mod in modules_to_clean:
         if mod in sys.modules:
             del sys.modules[mod]
     
     test_cases = [
         {
-            'name': 'import a.b.c',
-            'module_name': 'a.b.c',
+            'name': 'import test_a.b.c',
+            'module_name': 'test_a.b.c',
             'fromlist': None,
-            'expected_return': 'a'  # import a.b.c 返回顶层包 a
+            'expected_return': 'test_a'
         },
         {
-            'name': 'from a.b import c',
-            'module_name': 'a.b',
+            'name': 'from test_a.b import c',
+            'module_name': 'test_a.b',
             'fromlist': ['c'],
-            'expected_return': 'a.b'  # from a.b import c 返回包 a.b
+            'expected_return': 'test_a.b'
         },
         {
-            'name': 'from a.b.c import function_in_c',
-            'module_name': 'a.b.c',
+            'name': 'from test_a.b.c import function_in_c',
+            'module_name': 'test_a.b.c',
             'fromlist': ['function_in_c'],
-            'expected_return': 'a.b.c'  # from a.b.c import function_in_c 返回模块 a.b.c
+            'expected_return': 'test_a.b.c'
         }
     ]
     
