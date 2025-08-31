@@ -168,10 +168,16 @@ def python_import_simulation(module_name, fromlist=None, level=0, globals_dict=N
         else:
             # 如果父包不在缓存中，递归调用本函数来导入它。
             print(f"   [CACHE] 需要先导入父包: '{parent_name}'")
-            python_import_simulation(parent_name)  # 导入父包
-            # 从 sys.modules 中获取实际的模块对象，而不是使用返回值
-            parent_module = sys.modules[parent_name]
-            parent_modules.append((parent_name, parent_module))
+            try:
+                python_import_simulation(parent_name)  # 导入父包
+                # 检查递归调用是否真的成功了
+                parent_module = sys.modules.get(parent_name)
+                if parent_module is None:
+                    raise ImportError(f"递归导入父包 '{parent_name}' 失败：模块未在缓存中")
+                parent_modules.append((parent_name, parent_module))
+            except ImportError:
+                # 递归导入失败，重新抛出更有意义的错误
+                raise ImportError(f"无法导入 '{module_name}'：父包 '{parent_name}' 导入失败")
 
     # ========================================================================
     # 阶段3: 模块查找 (Finding)
@@ -302,6 +308,9 @@ def python_import_simulation(module_name, fromlist=None, level=0, globals_dict=N
         if parent_module:
             setattr(parent_module, submodule_name, module)
             print(f"   设置父包属性: {parent_name}.{submodule_name}")
+        else:
+            # 这种情况不应该发生，如果发生说明有bug
+            raise ImportError(f"无法绑定子模块 '{submodule_name}' 到父包 '{parent_name}'：父包不在缓存中")
 
     # 6.2 处理`from module import item`语句
     if fromlist:
