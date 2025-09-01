@@ -23,3 +23,11 @@ class UtilityClass:
 # 模块级别的变量
 utils_version = "1.0.0"
 utils_data = {"type": "utility", "package": "test_package"}
+
+# 测试相对导入 - 这会暴露递归调用中的bug
+print("utils模块尝试相对导入...")
+try:
+    from . import package_function
+    print(f"utils模块中的相对导入成功: {package_function()}")
+except Exception as e:
+    print(f"utils模块中的相对导入失败: {e}")

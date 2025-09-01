@@ -154,7 +154,7 @@ def python_import_simulation(module_name, fromlist=None, level=0, globals_dict=N
 
         # 如果是`from import`，还需要进一步处理fromlist
         if fromlist:
-            return handle_fromlist(cached_module, fromlist)
+            return handle_fromlist(cached_module, fromlist, globals_dict=globals_dict)
         return cached_module
 
     # 2.2 对于嵌套模块 (如 a.b.c)，必须先确保其父包 (a, a.b) 已被导入。
@@ -317,7 +317,7 @@ def python_import_simulation(module_name, fromlist=None, level=0, globals_dict=N
         print(f"   处理from import: {fromlist}")
         # `handle_fromlist`会确保`fromlist`中的每一项都存在，
         # 如果某项是子模块，会触发对该子模块的导入。
-        return handle_fromlist(module, fromlist)
+        return handle_fromlist(module, fromlist, globals_dict=globals_dict)
 
     # 6.3 对于`import a.b.c`，返回的是顶层包`a`。
     # 这是`import`语句的一个重要特性。
@@ -420,7 +420,7 @@ def find_in_paths(module_name, search_paths):
     
     return None
 
-def handle_fromlist(module, fromlist):
+def handle_fromlist(module, fromlist, globals_dict=None):
     """
     处理`from module import item1, item2`中的`fromlist`。
     """
@@ -439,7 +439,7 @@ def handle_fromlist(module, fromlist):
                     submodule_name = f"{module.__name__}.{item}"
                     try:
                         # 递归导入这个子模块
-                        python_import_simulation(submodule_name)
+                        python_import_simulation(submodule_name, globals_dict=globals_dict)
                     except ImportError:
                         # 如果导入失败，说明它确实只是一个不存在的属性，而不是子模块。
                         # Python的真实行为会在这里抛出ImportError，但为了模拟简化，我们忽略。
@@ -462,7 +462,7 @@ def get_current_package(globals_dict=None):
     """
     if globals_dict and '__package__' in globals_dict:
         package = globals_dict['__package__']
-        if package:
+        if package is not None:
             return package
     if globals_dict and '__name__' in globals_dict:
         name = globals_dict['__name__']
